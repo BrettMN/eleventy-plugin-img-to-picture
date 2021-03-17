@@ -1,0 +1,38 @@
+{
+  "name": "eleventy-plugin-img-to-picture",
+  "version": "0.0.1",
+  "description": "Eleventy plugin to convert image elements to picture elements and process images to better performat formats",
+  "main": ".eleventy.js",
+  "scripts": {
+    "test": "npm run test:clean && npm run test:run",
+    "test:run": "cd test && npx @11ty/eleventy --watch",
+    "test:clean": "del-cli test/dist/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BrettMN/eleventy-plugin-img-to-picture.git"
+  },
+  "keywords": [
+    "eleventy",
+    "eleventy-plugin"
+  ],
+  "author": {
+    "name": "Brett M. Nelson",
+    "email": "brett@wipdeveloper.com",
+    "url": "https://wipdeveloper.com/"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/BrettMN/eleventy-plugin-img-to-picture/issues"
+  },
+  "homepage": "https://github.com/BrettMN/eleventy-plugin-img-to-picture#readme",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.5",
+    "jsdom": "^16.5.1",
+    "sharp": "^0.27.2"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "^0.11.1",
+    "del-cli": "^3.0.1"
+  }
+}
