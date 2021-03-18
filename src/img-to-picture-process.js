@@ -11,118 +11,118 @@ const logImageResize = false;
 const logFormatName = false;
 const logReplaceImgsWithPictures = false;
 
-const sizes = [
-  { screen: { max: 639 }, img: { width: 620 } },
-  { screen: { min: 640, max: 767 }, img: { width: 620 } },
-  { screen: { min: 768, max: 1023 }, img: { width: 750 } },
-  { screen: { min: 1024, max: 1279 }, img: { width: 1000 } },
-  { screen: { min: 1280 }, img: { width: 1260 } },
-];
+// const sizes = [
+//   { screen: { max: 639 }, img: { width: 620 } },
+//   { screen: { min: 640, max: 767 }, img: { width: 620 } },
+//   { screen: { min: 768, max: 1023 }, img: { width: 750 } },
+//   { screen: { min: 1024, max: 1279 }, img: { width: 1000 } },
+//   { screen: { min: 1280 }, img: { width: 1260 } },
+// ];
 
-const logMessage = function (shouldLog, ...messages) {
-  if (shouldLog) {
-    console.log(...messages);
-  }
-};
+// const logMessage = function (shouldLog, ...messages) {
+//   if (shouldLog) {
+//     console.log(...messages);
+//   }
+// };
 
-const formatNewFileName = function (imagePath, size) {
-  logMessage(logFormatName, `Start formatNewFileName: ${imagePath}`);
-  imagePath = imagePath.replace(/"/g, '');
+// const formatNewFileName = function (imagePath, size) {
+//   logMessage(logFormatName, `Start formatNewFileName: ${imagePath}`);
+//   imagePath = imagePath.replace(/"/g, '');
 
-  logMessage(logFormatName, { imagePath });
+//   logMessage(logFormatName, { imagePath });
 
-  if (imagePath.length !== 0) {
-    let imagePathChunks = imagePath.split('.');
+//   if (imagePath.length !== 0) {
+//     let imagePathChunks = imagePath.split('.');
 
-    logMessage(logFormatName, { imagePathChunks });
+//     logMessage(logFormatName, { imagePathChunks });
 
-    let imagePathStart = imagePathChunks[0];
+//     let imagePathStart = imagePathChunks[0];
 
-    logMessage(logFormatName, { imagePathStart });
+//     logMessage(logFormatName, { imagePathStart });
 
-    for (let i = 1; i < imagePathChunks.length - 1; i++) {
-      imagePathStart = `${imagePathStart}.${imagePathChunks[i]}`;
-    }
+//     for (let i = 1; i < imagePathChunks.length - 1; i++) {
+//       imagePathStart = `${imagePathStart}.${imagePathChunks[i]}`;
+//     }
 
-    let sizesText = `-${size.img.height ? size.img.height + 'h' : ''}${
-      size.img.height && size.img.height ? 'x' : ''
-    }${size.img.width ? size.img.width + 'w' : ''}.`;
+//     let sizesText = `-${size.img.height ? size.img.height + 'h' : ''}${
+//       size.img.height && size.img.height ? 'x' : ''
+//     }${size.img.width ? size.img.width + 'w' : ''}.`;
 
-    logMessage(logFormatName, { sizesText });
+//     logMessage(logFormatName, { sizesText });
 
-    const finalImagePath = `${imagePathStart}-resized-${sizesText}${
-      imagePathChunks[imagePathChunks.length - 1].toLowerCase() === 'gif'
-        ? 'gif'
-        : 'webp'
-    }`;
+//     const finalImagePath = `${imagePathStart}-resized-${sizesText}${
+//       imagePathChunks[imagePathChunks.length - 1].toLowerCase() === 'gif'
+//         ? 'gif'
+//         : 'webp'
+//     }`;
 
-    logMessage(logFormatName, 'END formatNewFileName', { finalImagePath });
+//     logMessage(logFormatName, 'END formatNewFileName', { finalImagePath });
 
-    return finalImagePath;
-  } else {
-    logMessage(logFormatName, 'Original Image path empty');
-  }
-};
+//     return finalImagePath;
+//   } else {
+//     logMessage(logFormatName, 'Original Image path empty');
+//   }
+// };
 
-const resizeImage = function (imagePath) {
-  return new Promise((resolve, reject) => {
-    sizes.forEach((size) => {
-      let newImagePath = formatNewFileName(imagePath, size);
+// const resizeImage = function (imagePath) {
+//   return new Promise((resolve, reject) => {
+//     sizes.forEach((size) => {
+//       let newImagePath = formatNewFileName(imagePath, size);
 
-      let sharpOptions = {
-        withoutEnlargement: true,
-      };
+//       let sharpOptions = {
+//         withoutEnlargement: true,
+//       };
 
-      if (size.img.width) {
-        sharpOptions.width = size.img.width;
-      }
-      if (size.img.height) {
-        sharpOptions.height = size.img.height;
-      }
+//       if (size.img.width) {
+//         sharpOptions.width = size.img.width;
+//       }
+//       if (size.img.height) {
+//         sharpOptions.height = size.img.height;
+//       }
 
-      try {
-        if (!fs.existsSync(newImagePath)) {
-          logMessage(logImageResize, { imagePath });
-          logMessage(logImageResize, { newImagePath });
-          sharp(imagePath)
-            .resize(sharpOptions)
-            .toFile(newImagePath)
-            .then((info) => {
-              logMessage(logImageResize, `image resized: ${newImagePath}`, {
-                info,
-              });
-              resolve();
-            })
-            .catch((err) => {
-              console.error(`image resize failed: ${newImagePath}`);
-              console.error({ err });
-              reject(err);
-            });
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    });
-  });
-};
+//       try {
+//         if (!fs.existsSync(newImagePath)) {
+//           logMessage(logImageResize, { imagePath });
+//           logMessage(logImageResize, { newImagePath });
+//           sharp(imagePath)
+//             .resize(sharpOptions)
+//             .toFile(newImagePath)
+//             .then((info) => {
+//               logMessage(logImageResize, `image resized: ${newImagePath}`, {
+//                 info,
+//               });
+//               resolve();
+//             })
+//             .catch((err) => {
+//               console.error(`image resize failed: ${newImagePath}`);
+//               console.error({ err });
+//               reject(err);
+//             });
+//         }
+//       } catch (err) {
+//         console.error(err);
+//       }
+//     });
+//   });
+// };
 
-const getAllFiles = function (dirPath, arrayOfFiles) {
-  // let dirName = __dirname.replace('/scripts', '');
+// const getAllFiles = function (dirPath, arrayOfFiles) {
+//   // let dirName = __dirname.replace('/scripts', '');
 
-  let files = fs.readdirSync(dirPath);
+//   let files = fs.readdirSync(dirPath);
 
-  arrayOfFiles = arrayOfFiles || [];
+//   arrayOfFiles = arrayOfFiles || [];
 
-  files.forEach(function (file) {
-    if (fs.statSync(dirPath + '/' + file).isDirectory()) {
-      arrayOfFiles = getAllFiles(dirPath + '/' + file, arrayOfFiles);
-    } else {
-      arrayOfFiles.push(path.join(dirPath, '/', file));
-    }
-  });
+//   files.forEach(function (file) {
+//     if (fs.statSync(dirPath + '/' + file).isDirectory()) {
+//       arrayOfFiles = getAllFiles(dirPath + '/' + file, arrayOfFiles);
+//     } else {
+//       arrayOfFiles.push(path.join(dirPath, '/', file));
+//     }
+//   });
 
-  return arrayOfFiles;
-};
+//   return arrayOfFiles;
+// };
 
 function replaceImgsWithPictures(filePath) {
   logMessage(logReplaceImgsWithPictures, { filePath });

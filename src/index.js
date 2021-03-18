@@ -321,39 +321,39 @@ module.exports = {
       });
     });
 
-    eleventyConfig.addTransform('imgToPicture', async function (
-      content,
-      outputPath
-    ) {
-      sizes = options.sizes || defaultSizes;
-      if (outputPath.includes('.html')) {
-        content = replaceImgsWithPictures(content);
-      } else {
-        if (
-          outputPath.includes('.png') ||
-          outputPath.includes('.gif') ||
-          outputPath.includes('.jpg') ||
-          outputPath.includes('.jpeg') ||
-          outputPath.includes('.bmp')
-        ) {
+    eleventyConfig.addTransform(
+      'imgToPicture',
+      async function (content, outputPath) {
+        sizes = options.sizes || defaultSizes;
+        if (outputPath.includes('.html')) {
+          content = replaceImgsWithPictures(content);
+        } else {
           if (
-            outputPath.indexOf('dist/windows') === -1 &&
-            outputPath.indexOf('dist/ios') === -1 &&
-            outputPath.indexOf('dist/android') === -1 &&
-            outputPath.indexOf('dist/chrome') === -1 &&
-            outputPath.indexOf('dist/firefox') === -1 &&
-            outputPath.indexOf('mstile-') === -1 &&
-            outputPath.indexOf('favicon-') === -1 &&
-            outputPath.indexOf('apple-touch-icon-') === -1 &&
-            outputPath.indexOf('android-chrome-') === -1 &&
-            outputPath.indexOf('-resized-') === -1
+            outputPath.includes('.png') ||
+            outputPath.includes('.gif') ||
+            outputPath.includes('.jpg') ||
+            outputPath.includes('.jpeg') ||
+            outputPath.includes('.bmp')
           ) {
-            logMessage(true, outputPath);
-            content = resizeImage(outputPath);
+            if (
+              outputPath.indexOf('dist/windows') === -1 &&
+              outputPath.indexOf('dist/ios') === -1 &&
+              outputPath.indexOf('dist/android') === -1 &&
+              outputPath.indexOf('dist/chrome') === -1 &&
+              outputPath.indexOf('dist/firefox') === -1 &&
+              outputPath.indexOf('mstile-') === -1 &&
+              outputPath.indexOf('favicon-') === -1 &&
+              outputPath.indexOf('apple-touch-icon-') === -1 &&
+              outputPath.indexOf('android-chrome-') === -1 &&
+              outputPath.indexOf('-resized-') === -1
+            ) {
+              logMessage(true, outputPath);
+              content = resizeImage(outputPath);
+            }
           }
         }
+        return content;
       }
-      return content;
-    });
+    );
   },
 };
