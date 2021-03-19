@@ -69,7 +69,7 @@ module.exports = function (fileContents, { sizes }) {
         logMessage(logReplaceImgsWithPictures, { path });
         sources.push(
           `<source srcset="${path.path}" width="${
-            path.size.img.with
+            path.size.img.width
           }" media="(${
             path.size.screen.min
               ? 'min-width: ' + path.size.screen.min + 'px'
