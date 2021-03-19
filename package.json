@@ -5,7 +5,8 @@
   "main": ".eleventy.js",
   "scripts": {
     "test": "npm run test:clean && npm run test:run",
-    "test:run": "cd test && npx @11ty/eleventy --watch",
+    "test:run": "cd test && npx @11ty/eleventy",
+    "test:watch": "cd test && npx @11ty/eleventy --watch",
     "test:clean": "del-cli test/dist/"
   },
   "repository": {

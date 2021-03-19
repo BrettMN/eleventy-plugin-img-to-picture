@@ -1,3 +1,12 @@
+const fs = require('fs');
+const path = require('path');
+const sharp = require('sharp');
+
+const formatNewFileName = require('./formatFileName');
+
+const logMessage = require('./logMessage');
+const logImageResize = false;
+
 module.exports = function (imagePath) {
   return new Promise((resolve, reject) => {
     sizes.forEach((size) => {

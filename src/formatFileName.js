@@ -1,3 +1,7 @@
+const logMessage = require('./logMessage');
+
+const logFormatName = false;
+
 module.exports = function (imagePath, size) {
   logMessage(logFormatName, `Start formatNewFileName: ${imagePath}`);
   imagePath = imagePath.replace(/"/g, '');
