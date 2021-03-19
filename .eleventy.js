@@ -14,17 +14,11 @@ const defaultOptions = {
 };
 
 module.exports = function (eleventyConfig, options) {
-  eleventyConfig.on('beforeBuild', (...changedFiles) => {
-    // Run me before the build starts
-    console.log('beforeBuild', { changedFiles });
-  });
-
   eleventyConfig.on('afterBuild', async () => {
-    console.log('afterBuild', eleventyConfig.dir);
     let filesResults = getAllFiles('dist', [], options.images.types);
     filesResults.forEach((filePath) => {
       //TODO: Skip here
-      console.log(true, filePath);
+
       return resizeImage(filePath);
     });
   });
@@ -32,14 +26,10 @@ module.exports = function (eleventyConfig, options) {
   eleventyConfig.addTransform(
     'imgToPicture',
     async function (content, outputPath) {
-      console.log('imgToPicture');
       sizes = options.sizes || defaultSizes;
 
       if (outputPath.includes('.html')) {
-        console.log('imgToPicture:html');
         content = replaceImgsWithPictures(content, { sizes });
-      } else {
-        console.log('imgToPicture:not html');
       }
       return content;
     }

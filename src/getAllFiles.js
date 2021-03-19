@@ -18,9 +18,7 @@ function getAllFiles(dirPath, arrayOfFiles, extensions = []) {
         extensions
       );
     } else {
-      console.log({ file });
       if (extensions.filter((f) => file.split('.').pop() === f).length > 0) {
-        console.log('found one');
         arrayOfFiles.push(path.join(dirPath, '/', file));
       }
     }
