@@ -1,3 +1,4 @@
+const fs = require('fs');
 const cheerio = require('cheerio');
 const jsdom = require('jsdom');
 const { JSDOM } = jsdom;
@@ -5,112 +6,110 @@ const { JSDOM } = jsdom;
 const logMessage = require('./logMessage');
 
 const formatNewFileName = require('./formatFileName');
+const resizeImage = require('./resizeImage');
 
-const logReplaceImgsWithPictures = false;
+const logReplaceImgsWithPictures = true;
 
-module.exports = function (fileContents, { sizes }) {
+function log(...things) {
+  logMessage(logReplaceImgsWithPictures, ...things);
+}
+
+module.exports = async function (filePath, { sizes, output }) {
   logMessage(logReplaceImgsWithPictures);
 
-  // let fileContents = fs.readFileSync(filePath, 'utf8');
-
-  let pictureElement = '';
+  let fileContents = fs.readFileSync(filePath, 'utf8');
 
   let updatedContent = '';
+
+  getImgsToReplaceWithPictures(
+    fileContents,
+    sizes,
+    output,
+    function (imgsToReplaceWithPictures) {
+      log({ imgsToReplaceWithPictures });
+
+      updatedContent = fileContents;
+
+      imgsToReplaceWithPictures.forEach((imgToReplaceWithPicture) => {
+        updatedContent = updatedContent.replace(
+          imgToReplaceWithPicture.img,
+          imgToReplaceWithPicture.picture
+        );
+      });
+
+      fs.writeFileSync(filePath, fileContents);
+
+      log(`file ${filePath} changed? ${fileContents !== updatedContent}`);
+    }
+  );
+  // return fileContents;
+};
+
+async function getImgsToReplaceWithPictures(
+  fileContents,
+  sizes,
+  output,
+  callback
+) {
+  let imgsToReplaceWithPictures = [];
+  let pictureElement = '';
+  let processedImagesSrc = [];
 
   let dom = new JSDOM(fileContents, { includeNodeLocations: true });
 
   const document = dom.window.document;
   const imgElements = document.querySelectorAll('img');
 
-  logMessage(logReplaceImgsWithPictures, { imgElements });
+  log({ imgElements });
 
-  logMessage(logReplaceImgsWithPictures, imgElements.length);
-  let processedImagesSrc = [];
+  log(imgElements.length);
 
-  let imgsToReplaceWithPictures = [];
-
-  imgElements.forEach((img) => {
+  imgElements.forEach(async (img) => {
     let location = dom.nodeLocation(img);
 
-    logMessage(logReplaceImgsWithPictures, { location });
+    log({ location });
 
     let imgString = fileContents.slice(
       location.startOffset,
       location.endOffset
     );
 
-    logMessage(logReplaceImgsWithPictures, { imgString });
+    log({ imgString });
 
     let srcPathLocation = location.attrs.src;
 
-    // logMessage(logReplaceImgsWithPictures, { srcPathLocation });
+    log({ srcPathLocation });
 
-    // console.log(`fileContents.length: ${fileContents.length}`);
+    log(`fileContents.length: ${fileContents.length}`);
 
     // let srcPath = fileContents
     //   .slice(srcPathLocation.startOffset, srcPathLocation.endOffset)
     //   .slice(4); //remove src=
-
     const srcPath = cheerio.load(imgString)('img').attr('src');
 
     if (processedImagesSrc.includes(srcPath) == false) {
-      let newPaths = [];
-      sizes.forEach((size) => {
-        let newFileName = formatNewFileName(srcPath, size);
-        if (newFileName) {
-          newPaths.push({
-            path: newFileName,
-            size: size,
-          });
+      resizeImage(srcPath, { sizes, output }).then((sources) => {
+        log({ sources });
+
+        pictureElement = `
+          <picture>
+            ${sources.join('')}
+            ${imgString}
+          </picture>
+          `;
+        log({ pictureElement });
+
+        imgsToReplaceWithPictures.push({
+          img: imgString,
+          picture: pictureElement,
+        });
+
+        processedImagesSrc.push(srcPath);
+
+        if (imgElements.length === processedImagesSrc) {
+          callback(imgsToReplaceWithPictures);
         }
       });
-      let sources = [];
-      newPaths.forEach((path) => {
-        logMessage(logReplaceImgsWithPictures, { path });
-        sources.push(
-          `<source srcset="${path.path}" width="${
-            path.size.img.width
-          }" media="(${
-            path.size.screen.min
-              ? 'min-width: ' + path.size.screen.min + 'px'
-              : ''
-          }${path.size.screen.max && path.size.screen.min ? ') and (' : ''}${
-            path.size.screen.max
-              ? 'max-width: ' + path.size.screen.max + 'px'
-              : ''
-          })" type="image/webp">`
-        );
-      });
-      pictureElement = `
-      <picture>
-        ${sources.join('')}
-        ${imgString}
-      </picture>
-      `;
-      logMessage(logReplaceImgsWithPictures, { pictureElement });
-
-      imgsToReplaceWithPictures.push({
-        img: imgString,
-        picture: pictureElement,
-      });
-
-      processedImagesSrc.push(srcPath);
     }
   });
-
-  imgsToReplaceWithPictures.forEach((imgToReplaceWithPicture) => {
-    fileContents = fileContents.replace(
-      imgToReplaceWithPicture.img,
-      imgToReplaceWithPicture.picture
-    );
-  });
-
-  // fs.writeFileSync(filePath, fileContents);
-
-  // logMessage(
-  //   logReplaceImgsWithPictures,
-  //   `file ${filePath} changed? ${fileContents !== updatedContent}`
-  // );
-
-  return fileContents;
-};
+}

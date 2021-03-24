@@ -20,6 +20,7 @@ module.exports = function (eleventyConfig) {
       { screen: { min: 1280 }, img: { width: 1260 } },
     ],
     images: { types: ['png'], skip: [] },
+    output: 'dist',
   });
 
   return {
