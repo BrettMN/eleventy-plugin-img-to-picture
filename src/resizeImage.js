@@ -36,12 +36,15 @@ module.exports = function (imagePath, { sizes, output }) {
           log({ newImagePath });
           let info = await sharp(`${output}/${imagePath}`)
             .resize(sharpOptions)
-            .toFile(`${output}/${newImagePath}`)
-            .catch((err) => {
-              console.error(`image resize failed: ${newImagePath}`);
-              console.error({ err });
-              reject(err);
-            });
+            .toFile(`${output}/${newImagePath}`);
+          // .then(function (info) {
+
+          // })
+          // .catch((err) => {
+          //   console.error(`image resize failed: ${newImagePath}`);
+          //   console.error({ err });
+          //   reject(err);
+          // });
 
           log(`image resized: ${newImagePath}`, {
             info,
@@ -56,17 +59,12 @@ module.exports = function (imagePath, { sizes, output }) {
               size.screen.max ? 'max-width: ' + size.screen.max + 'px' : ''
             })" type="image/${info.format}">`
           );
-
-          if (sources.length == sizes.length) {
-            log('before resolve', { sources });
-            resolve(sources);
-          }
         }
       } catch (err) {
         console.error(err);
       }
     });
     log('before resolve', { sources });
-    // return sources;
+    resolve(sources);
   });
 };

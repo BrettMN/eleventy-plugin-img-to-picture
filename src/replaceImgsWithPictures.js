@@ -21,74 +21,70 @@ module.exports = async function (filePath, { sizes, output }) {
 
   let updatedContent = '';
 
-  getImgsToReplaceWithPictures(
+  let imgsToReplaceWithPictures = await getImgsToReplaceWithPictures(
     fileContents,
     sizes,
-    output,
-    function (imgsToReplaceWithPictures) {
-      log({ imgsToReplaceWithPictures });
-
-      updatedContent = fileContents;
-
-      imgsToReplaceWithPictures.forEach((imgToReplaceWithPicture) => {
-        updatedContent = updatedContent.replace(
-          imgToReplaceWithPicture.img,
-          imgToReplaceWithPicture.picture
-        );
-      });
-
-      fs.writeFileSync(filePath, fileContents);
-
-      log(`file ${filePath} changed? ${fileContents !== updatedContent}`);
-    }
+    output
   );
+
+  log({ imgsToReplaceWithPictures });
+
+  updatedContent = fileContents;
+
+  imgsToReplaceWithPictures.forEach((imgToReplaceWithPicture) => {
+    updatedContent = updatedContent.replace(
+      imgToReplaceWithPicture.img,
+      imgToReplaceWithPicture.picture
+    );
+  });
+
+  fs.writeFileSync(filePath, fileContents);
+
+  log(`file ${filePath} changed? ${fileContents !== updatedContent}`);
+
   // return fileContents;
 };
 
-async function getImgsToReplaceWithPictures(
-  fileContents,
-  sizes,
-  output,
-  callback
-) {
-  let imgsToReplaceWithPictures = [];
-  let pictureElement = '';
-  let processedImagesSrc = [];
+async function getImgsToReplaceWithPictures(fileContents, sizes, output) {
+  return new Promise((resolve, reject) => {
+    let imgsToReplaceWithPictures = [];
+    let pictureElement = '';
+    let processedImagesSrc = [];
 
-  let dom = new JSDOM(fileContents, { includeNodeLocations: true });
+    let dom = new JSDOM(fileContents, { includeNodeLocations: true });
 
-  const document = dom.window.document;
-  const imgElements = document.querySelectorAll('img');
+    const document = dom.window.document;
+    const imgElements = document.querySelectorAll('img');
 
-  log({ imgElements });
+    log({ imgElements });
 
-  log(imgElements.length);
+    log(imgElements.length);
 
-  imgElements.forEach(async (img) => {
-    let location = dom.nodeLocation(img);
+    imgElements.forEach(async (img) => {
+      let location = dom.nodeLocation(img);
 
-    log({ location });
+      log({ location });
 
-    let imgString = fileContents.slice(
-      location.startOffset,
-      location.endOffset
-    );
+      let imgString = fileContents.slice(
+        location.startOffset,
+        location.endOffset
+      );
 
-    log({ imgString });
+      log({ imgString });
 
-    let srcPathLocation = location.attrs.src;
+      let srcPathLocation = location.attrs.src;
 
-    log({ srcPathLocation });
+      log({ srcPathLocation });
 
-    log(`fileContents.length: ${fileContents.length}`);
+      log(`fileContents.length: ${fileContents.length}`);
 
-    // let srcPath = fileContents
-    //   .slice(srcPathLocation.startOffset, srcPathLocation.endOffset)
-    //   .slice(4); //remove src=
-    const srcPath = cheerio.load(imgString)('img').attr('src');
+      // let srcPath = fileContents
+      //   .slice(srcPathLocation.startOffset, srcPathLocation.endOffset)
+      //   .slice(4); //remove src=
+      const srcPath = cheerio.load(imgString)('img').attr('src');
 
-    if (processedImagesSrc.includes(srcPath) == false) {
-      resizeImage(srcPath, { sizes, output }).then((sources) => {
+      if (processedImagesSrc.includes(srcPath) == false) {
+        let sources = await resizeImage(srcPath, { sizes, output });
         log({ sources });
 
         pictureElement = `
@@ -107,9 +103,9 @@ async function getImgsToReplaceWithPictures(
         processedImagesSrc.push(srcPath);
 
         if (imgElements.length === processedImagesSrc) {
-          callback(imgsToReplaceWithPictures);
+          resolve(imgsToReplaceWithPictures);
         }
-      });
-    }
+      }
+    });
   });
 }
