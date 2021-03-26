@@ -22,8 +22,6 @@ module.exports = function (filePath, { sizes, output }) {
     filePath,
     getImgsToReplaceWithPicturesCallback
   );
-
-  // return fileContents;
 };
 
 function getImgsToReplaceWithPicturesCallback(
@@ -83,26 +81,31 @@ function getImgsToReplaceWithPictures(sizes, output, filePath, callback) {
     const srcPath = cheerio.load(imgString)('img').attr('src');
 
     if (processedImagesSrc.includes(srcPath) == false) {
-      resizeImage(srcPath, { sizes, output }, function (sources) {
-        log({ sources });
+      resizeImage(
+        srcPath,
+        { sizes, output },
 
-        pictureElement = `
+        function (sources) {
+          log({ sources });
+
+          pictureElement = `
           <picture>
             ${sources.join('')}
             ${imgString}
           </picture>
           `;
-        log({ pictureElement });
+          log({ pictureElement });
 
-        imgsToReplaceWithPictures.push({
-          img: imgString,
-          picture: pictureElement,
-        });
+          imgsToReplaceWithPictures.push({
+            img: imgString,
+            picture: pictureElement,
+          });
 
-        processedImagesSrc.push(srcPath);
+          processedImagesSrc.push(srcPath);
 
-        callback(imgsToReplaceWithPictures, fileContents, filePath);
-      });
+          callback(imgsToReplaceWithPictures, fileContents, filePath);
+        }
+      );
     }
   });
 }
