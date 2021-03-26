@@ -1,5 +1,4 @@
 const fs = require('fs');
-const path = require('path');
 const sharp = require('sharp');
 
 const formatNewFileName = require('./formatFileName');
@@ -12,43 +11,27 @@ function log(...things) {
 }
 
 module.exports = function (imagePath, { sizes, output }, callback) {
-  console.info('Order: 5');
-
   let sources = [];
 
   log({ sizes });
   sizes.forEach((size) => {
-    console.info('Order: 6');
     let newImagePath = formatNewFileName(imagePath, size);
 
-    let sharpOptions = {
-      withoutEnlargement: true,
-    };
-
-    if (size.img.width) {
-      sharpOptions.width = size.img.width;
-    }
-    if (size.img.height) {
-      sharpOptions.height = size.img.height;
-    }
+    let sharpOptions = createSharpOptions(size);
 
     try {
       if (!fs.existsSync(`${output}/${newImagePath}`)) {
         log({ imagePath });
         log({ newImagePath });
-        console.info('Order: 6.1');
 
         sharp(`${output}/${imagePath}`)
           .resize(sharpOptions)
           .toFile(`${output}/${newImagePath}`)
           .then(function (info) {
-            console.info('Order: 6.2');
-
             log(`image resized: ${newImagePath}`, {
               info,
             });
 
-            console.info('Order: 7');
             sources.push(
               `<source srcset="${newImagePath}" width="${info.width}" height="${
                 info.height
@@ -60,7 +43,6 @@ module.exports = function (imagePath, { sizes, output }, callback) {
             );
 
             if (sources.length === sizes.length) {
-              console.info('Order: 8');
               log('before resolve');
               callback(sources);
             }
@@ -68,15 +50,24 @@ module.exports = function (imagePath, { sizes, output }, callback) {
           .catch((err) => {
             console.error(`image resize failed: ${newImagePath}`);
             console.error({ err });
-            reject(err);
           });
       }
     } catch (err) {
       console.error(err);
     }
   });
-
-  // console.info('Order: 8');
-  // log('before resolve', { sources });
-  // callback(sources);
 };
+
+function createSharpOptions(size) {
+  let sharpOptions = {
+    withoutEnlargement: true,
+  };
+
+  if (size.img.width) {
+    sharpOptions.width = size.img.width;
+  }
+  if (size.img.height) {
+    sharpOptions.height = size.img.height;
+  }
+  return sharpOptions;
+}
