@@ -14,28 +14,20 @@ const defaultOptions = {
 };
 
 module.exports = function (eleventyConfig, options) {
-  eleventyConfig.on(
-    'afterBuild',
-    async () => {
-      let sizes = options.sizes || defaultSizes;
+  eleventyConfig.on('afterBuild', () => {
+    let sizes = options.sizes || defaultSizes;
 
-      let output = options.output || '_site';
+    let output = options.output || '_site';
 
-      let filesResults = getAllFiles('dist', [], ['html']);
-      setTimeout(() => {
-        filesResults.forEach((filePath, index) => {
-          //TODO: Skip here
+    let filesResults = getAllFiles('dist', [], ['html']);
 
-          console.info('Order: 1', 'run: ' + index);
-          replaceImgsWithPictures(filePath, {
-            sizes,
-            output,
-          });
-        });
+    filesResults.forEach((filePath) => {
+      replaceImgsWithPictures(filePath, {
+        sizes,
+        output,
       });
-    },
-    1000
-  );
+    });
+  });
 
   // eleventyConfig.addTransform(
   //   'imgToPicture',
