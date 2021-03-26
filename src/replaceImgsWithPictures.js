@@ -5,7 +5,6 @@ const { JSDOM } = jsdom;
 
 const logMessage = require('./logMessage');
 
-const formatNewFileName = require('./formatFileName');
 const resizeImage = require('./resizeImage');
 
 const logReplaceImgsWithPictures = false;
@@ -15,52 +14,44 @@ function log(...things) {
 }
 
 module.exports = function (filePath, { sizes, output }) {
-  return new Promise((resolve) => {
-    console.info('Order: 2');
+  logMessage(logReplaceImgsWithPictures);
 
-    logMessage(logReplaceImgsWithPictures);
+  getImgsToReplaceWithPictures(
+    sizes,
+    output,
+    filePath,
+    getImgsToReplaceWithPicturesCallback
+  );
 
-    let fileContents = fs.readFileSync(filePath, 'utf8');
-
-    let updatedContent = '';
-
-    getImgsToReplaceWithPictures(
-      fileContents,
-      sizes,
-      output,
-      function (imgsToReplaceWithPictures) {
-        log({ imgsToReplaceWithPictures });
-
-        updatedContent = fileContents;
-
-        console.info('Order: 10');
-        imgsToReplaceWithPictures.forEach((imgToReplaceWithPicture) => {
-          updatedContent = updatedContent.replace(
-            imgToReplaceWithPicture.img,
-            imgToReplaceWithPicture.picture
-          );
-        });
-
-        console.info('Order: 11');
-        fs.writeFileSync(filePath, updatedContent);
-
-        log(`file ${filePath} changed? ${fileContents !== updatedContent}`);
-        console.log(
-          `file ${filePath} changed? ${fileContents !== updatedContent}`
-        );
-        resolve();
-      }
-    );
-
-    // return fileContents;
-  });
+  // return fileContents;
 };
 
-function getImgsToReplaceWithPictures(fileContents, sizes, output, callback) {
-  console.info('Order: 3');
+function getImgsToReplaceWithPicturesCallback(
+  imgsToReplaceWithPictures,
+  fileContents,
+  filePath
+) {
+  log({ imgsToReplaceWithPictures });
+
+  let updatedContent = fileContents;
+  imgsToReplaceWithPictures.forEach((imgToReplaceWithPicture) => {
+    updatedContent = updatedContent.replace(
+      imgToReplaceWithPicture.img,
+      imgToReplaceWithPicture.picture
+    );
+  });
+
+  fs.writeFileSync(filePath, updatedContent);
+
+  log(`file ${filePath} changed? ${imgsToReplaceWithPictures.length > 0}`);
+}
+
+function getImgsToReplaceWithPictures(sizes, output, filePath, callback) {
   let imgsToReplaceWithPictures = [];
   let pictureElement = '';
   let processedImagesSrc = [];
+
+  let fileContents = fs.readFileSync(filePath, 'utf8');
 
   let dom = new JSDOM(fileContents, { includeNodeLocations: true });
 
@@ -89,17 +80,11 @@ function getImgsToReplaceWithPictures(fileContents, sizes, output, callback) {
 
     log(`fileContents.length: ${fileContents.length}`);
 
-    // let srcPath = fileContents
-    //   .slice(srcPathLocation.startOffset, srcPathLocation.endOffset)
-    //   .slice(4); //remove src=
     const srcPath = cheerio.load(imgString)('img').attr('src');
 
     if (processedImagesSrc.includes(srcPath) == false) {
-      console.info('Order: 4');
       resizeImage(srcPath, { sizes, output }, function (sources) {
         log({ sources });
-
-        console.info('Order: 8.9');
 
         pictureElement = `
           <picture>
@@ -116,13 +101,8 @@ function getImgsToReplaceWithPictures(fileContents, sizes, output, callback) {
 
         processedImagesSrc.push(srcPath);
 
-        // if (imgElements.length === processedImagesSrc) {
-        console.info('Order: 9');
-        callback(imgsToReplaceWithPictures);
-        // }
+        callback(imgsToReplaceWithPictures, fileContents, filePath);
       });
     }
   });
-
-  // callback(imgsToReplaceWithPictures);
 }
