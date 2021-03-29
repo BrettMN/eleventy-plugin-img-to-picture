@@ -79,33 +79,34 @@ function getImgsToReplaceWithPictures(sizes, output, filePath, callback) {
     log(`fileContents.length: ${fileContents.length}`);
 
     const srcPath = cheerio.load(imgString)('img').attr('src');
+    if (srcPath.split('.').pop().toLocaleLowerCase() !== 'gif') {
+      if (processedImagesSrc.includes(srcPath) == false) {
+        resizeImage(
+          srcPath,
+          { sizes, output },
 
-    if (processedImagesSrc.includes(srcPath) == false) {
-      resizeImage(
-        srcPath,
-        { sizes, output },
+          function (sources) {
+            log({ sources });
 
-        function (sources) {
-          log({ sources });
-
-          pictureElement = `
+            pictureElement = `
           <picture>
             ${sources.join('')}
             ${imgString}
           </picture>
           `;
-          log({ pictureElement });
+            log({ pictureElement });
 
-          imgsToReplaceWithPictures.push({
-            img: imgString,
-            picture: pictureElement,
-          });
+            imgsToReplaceWithPictures.push({
+              img: imgString,
+              picture: pictureElement,
+            });
 
-          processedImagesSrc.push(srcPath);
+            processedImagesSrc.push(srcPath);
 
-          callback(imgsToReplaceWithPictures, fileContents, filePath);
-        }
-      );
+            callback(imgsToReplaceWithPictures, fileContents, filePath);
+          }
+        );
+      }
     }
   });
 }
