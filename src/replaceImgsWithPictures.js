@@ -76,7 +76,7 @@ function getImgsToReplaceWithPictures(sizes, output, filePath, callback) {
 
     const rawSrcPath = cheerio.load(imgString)('img').attr('src');
 
-    const srcPath = getAbsoluteImagePath(rawSrcPath, filePath);
+    const srcPath = getAbsoluteImagePath(rawSrcPath, filePath, output);
 
     if (srcPath.split('.').pop().toLocaleLowerCase() !== 'gif') {
       if (processedImagesSrc.includes(srcPath) == false) {
@@ -110,7 +110,7 @@ function getImgsToReplaceWithPictures(sizes, output, filePath, callback) {
   });
 }
 
-function getAbsoluteImagePath(srcPath, filePath) {
+function getAbsoluteImagePath(srcPath, filePath, output) {
   let finalImagePath = srcPath;
   console.log(typeof srcPath);
 
@@ -126,7 +126,19 @@ function getAbsoluteImagePath(srcPath, filePath) {
   console.log({ imagePathIsRelative });
 
   if (imagePathIsRelative) {
+    let filePathParts = filePath.split('/');
+    console.log({ filePathParts });
+    filePathParts.pop();
+    console.log({ filePathParts });
+    if (filePathParts[0].toLowerCase() === output.toLowerCase()) {
+      filePathParts.shift();
+    }
+    let filePathBase = `/${filePathParts.join('/')}/`;
+    console.log({ filePathBase });
+
+    finalImagePath = filePathBase + srcPath;
   }
 
+  console.log({ finalImagePath });
   return finalImagePath;
 }
