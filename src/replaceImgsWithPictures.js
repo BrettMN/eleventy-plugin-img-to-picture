@@ -72,13 +72,12 @@ function getImgsToReplaceWithPictures(sizes, output, filePath, callback) {
 
     log({ imgString });
 
-    let srcPathLocation = location.attrs.src;
-
-    log({ srcPathLocation });
-
     log(`fileContents.length: ${fileContents.length}`);
 
-    const srcPath = cheerio.load(imgString)('img').attr('src');
+    const rawSrcPath = cheerio.load(imgString)('img').attr('src');
+
+    const srcPath = getAbsoluteImagePath(rawSrcPath, filePath);
+
     if (srcPath.split('.').pop().toLocaleLowerCase() !== 'gif') {
       if (processedImagesSrc.includes(srcPath) == false) {
         resizeImage(
@@ -109,4 +108,25 @@ function getImgsToReplaceWithPictures(sizes, output, filePath, callback) {
       }
     }
   });
+}
+
+function getAbsoluteImagePath(srcPath, filePath) {
+  let finalImagePath = srcPath;
+  console.log(typeof srcPath);
+
+  let firstCharacter = srcPath.charAt(0);
+
+  console.log({ firstCharacter }, { srcPath });
+
+  let imagePathIsRelative = true;
+  if (firstCharacter === '/') {
+    imagePathIsRelative = false;
+  }
+
+  console.log({ imagePathIsRelative });
+
+  if (imagePathIsRelative) {
+  }
+
+  return finalImagePath;
 }
