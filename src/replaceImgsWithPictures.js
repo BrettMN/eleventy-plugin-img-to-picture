@@ -128,10 +128,15 @@ function getAbsoluteImagePath(srcPath, filePath, output) {
   if (imagePathIsRelative) {
     let filePathParts = filePath.split('/');
     console.log({ filePathParts });
+    if (filePathParts[filePathParts.length - 1] === 'index.html') {
+      filePathParts.pop();
+    }
     filePathParts.pop();
     console.log({ filePathParts });
-    if (filePathParts[0].toLowerCase() === output.toLowerCase()) {
-      filePathParts.shift();
+    if (!output) {
+      if (filePathParts[0].toLowerCase() === output.toLowerCase()) {
+        filePathParts.shift();
+      }
     }
     let filePathBase = `/${filePathParts.join('/')}/`;
     console.log({ filePathBase });

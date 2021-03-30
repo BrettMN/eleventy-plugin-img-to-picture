@@ -8,7 +8,7 @@ layout: base.11ty.js
 I had to face my fear…that was more important than just going on living…. I don’t like it. Geronimo! There’s always something to look at if you open your eyes! And everybody lives, Rose! Everybody lives! I need more days like this! Go on, ask me anything; I’m on fire! Goodbye, Clara. Alright? Of course I’m alright, my child. You know, I am so constantly outwitting the opposition, I tend to forget the delights and satisfaction of the gentle art of fisticuffs. Well, I’m still not the man I used to be… thank goodness.
 
 ![post two image](/two.png)
-![post two image](two1.png)
+![post two image](images/two1.png)
 
 A straight line may be the shortest distance between two points, but it is by no means the most interesting. Your hips are fine, you’re built like a man! You ain’t seen nothing yet! I never know why. I only know who. Great men are forged in fire. It is the privilege of lesser men to light the flame. Whatever the cost. I just have one question… do you know how to fly this thing? Yes, well, it’s a brilliant noise. I love that noise. The least important things, sometimes my dear boy, lead to the greatest discoveries.
 

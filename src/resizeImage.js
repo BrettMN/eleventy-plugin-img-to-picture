@@ -49,7 +49,7 @@ module.exports = function (imagePath, { sizes, output }, callback) {
           })
           .catch((err) => {
             console.error(`image resize failed: ${newImagePath}`);
-            console.error({ err });
+            console.error({ err }, { imagePath });
           });
       }
     } catch (err) {
