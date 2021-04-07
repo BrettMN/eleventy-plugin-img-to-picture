@@ -112,38 +112,31 @@ function getImgsToReplaceWithPictures(sizes, output, filePath, callback) {
 
 function getAbsoluteImagePath(srcPath, filePath, output) {
   let finalImagePath = srcPath;
-  console.log(typeof srcPath);
 
   let firstCharacter = srcPath.charAt(0);
-
-  console.log({ firstCharacter }, { srcPath });
 
   let imagePathIsRelative = true;
   if (firstCharacter === '/') {
     imagePathIsRelative = false;
   }
 
-  console.log({ imagePathIsRelative });
-
   if (imagePathIsRelative) {
     let filePathParts = filePath.split('/');
-    console.log({ filePathParts });
+
     if (filePathParts[filePathParts.length - 1] === 'index.html') {
       filePathParts.pop();
     }
     filePathParts.pop();
-    console.log({ filePathParts });
+
     if (!output) {
       if (filePathParts[0].toLowerCase() === output.toLowerCase()) {
         filePathParts.shift();
       }
     }
     let filePathBase = `/${filePathParts.join('/')}/`;
-    console.log({ filePathBase });
 
     finalImagePath = filePathBase + srcPath;
   }
 
-  console.log({ finalImagePath });
   return finalImagePath;
 }
